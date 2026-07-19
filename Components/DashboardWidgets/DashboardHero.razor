@@ -1,0 +1,62 @@
+﻿<div class="hero-container">
+
+    <div class="hero-content">
+
+        <div class="hero-left">
+
+            <span class="hero-badge">
+
+                <i class="fas fa-chart-line me-2"></i>
+
+                Dashboard Overview
+
+            </span>
+
+            <h1 class="hero-title">
+
+                Good @Greeting 👋
+
+            </h1>
+
+            <p class="hero-subtitle">
+
+                Welcome back to
+                <strong>Student Management System</strong>.
+                Here's a quick overview of your institute.
+
+            </p>
+
+            <div class="hero-date">
+
+                <i class="far fa-calendar-alt me-2"></i>
+
+                @DateTime.Now.ToString("dddd, dd MMMM yyyy")
+
+            </div>
+
+        </div>
+
+        <div class="hero-right">
+
+            <div class="hero-circle">
+
+                <i class="bi bi-mortarboard-fill"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code{
+
+    private string Greeting => DateTime.Now.Hour switch
+    {
+        < 12 => "Morning",
+        < 17 => "Afternoon",
+        _ => "Evening"
+    };
+
+}

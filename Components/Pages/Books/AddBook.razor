@@ -1,0 +1,254 @@
+﻿@page "/books/add"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin + "," + Roles.Librarian)]
+
+@inject BookService BookService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Book</PageTitle>
+
+<div class="card card-success shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-book-fill"></i>
+
+            Add Book
+
+        </h3>
+
+    </div>
+
+    <EditForm Model="book"
+              OnValidSubmit="SaveBook">
+
+        <DataAnnotationsValidator />
+
+        <ValidationSummary class="text-danger" />
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Book Code
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="book.BookCode" />
+
+                        <ValidationMessage For="@(() => book.BookCode)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Book Name
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="book.BookName" />
+
+                        <ValidationMessage For="@(() => book.BookName)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Author
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="book.Author" />
+
+                        <ValidationMessage For="@(() => book.Author)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Total Copies
+
+                        </label>
+
+                        <InputNumber class="form-control"
+                                     @bind-Value="book.TotalCopies" />
+
+                        <ValidationMessage For="@(() => book.TotalCopies)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-check mt-2">
+
+                <InputCheckbox class="form-check-input"
+                               @bind-Value="book.IsActive" />
+
+                <label class="form-check-label">
+
+                    Book Active
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button type="submit"
+                    class="btn btn-success"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-check-circle"></i>
+
+                Save
+
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Back
+
+            </button>
+
+            <button type="reset"
+                    class="btn btn-warning ms-2">
+
+                <i class="bi bi-arrow-clockwise"></i>
+
+                Reset
+
+            </button>
+
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+
+    private Book book = new()
+    {
+        IsActive = true,
+        TotalCopies = 1
+    };
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    private async Task SaveBook()
+    {
+        try
+        {
+            saving = true;
+
+            message = "";
+            error = "";
+
+            // Automatically set available copies
+            book.AvailableCopies = book.TotalCopies;
+
+            await BookService.AddBookAsync(book);
+
+            message = "Book added successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/books");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/books");
+    }
+
+}

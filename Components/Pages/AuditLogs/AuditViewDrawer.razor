@@ -1,0 +1,93 @@
+﻿@using StudentManagementSystemApp.Models
+
+@if (Audit != null)
+{
+    <div class="audit-overlay"
+         @onclick="Close">
+
+        <div class="audit-drawer"
+             @onclick:stopPropagation="true">
+
+            <div class="drawer-header">
+
+                <div>
+
+                    <h4>
+
+                        <i class="bi bi-journal-text me-2"></i>
+
+                        Audit Details
+
+                    </h4>
+
+                    <small>
+
+                        @Audit.CreatedDate.ToString("dd MMM yyyy hh:mm tt")
+
+                    </small>
+
+                </div>
+
+                <button class="btn btn-light btn-sm"
+
+                        @onclick="Close">
+
+                    <i class="bi bi-x-lg"></i>
+
+                </button>
+
+            </div>
+
+            <div class="drawer-body">
+
+                <AuditInfoCard Audit="Audit"/>
+
+                <div class="mt-4">
+
+                    <h5>
+
+                        <i class="bi bi-card-text me-2"></i>
+
+                        Description
+
+                    </h5>
+
+                    <div class="description-box">
+
+                        @Audit.Details
+
+                    </div>
+
+                </div>
+
+                <AuditChangeTable
+
+                    Changes="Changes"/>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@code{
+
+    [Parameter]
+
+    public AuditLog? Audit { get; set; }
+
+    [Parameter]
+
+    public List<AuditChange> Changes { get; set; } = [];
+
+    [Parameter]
+
+    public EventCallback OnClose { get; set; }
+
+    private async Task Close()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+}

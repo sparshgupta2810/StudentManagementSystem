@@ -1,0 +1,327 @@
+﻿@page "/subjects"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize]
+
+@inject SubjectService SubjectService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Subjects</PageTitle>
+
+<div class="card card-primary shadow">
+
+    <div class="card-header">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <h3 class="card-title">
+
+                <i class="bi bi-book-fill"></i>
+
+                Subjects
+
+            </h3>
+
+            <div class="d-flex align-items-center gap-2">
+
+                <input class="form-control"
+                       style="width:300px"
+                       placeholder="Search Subject Code or Name..."
+                       value="@searchText"
+                       @oninput="OnSearchChanged" />
+
+                @if (isAdmin)
+                {
+                    <button class="btn btn-secondary"
+                            @onclick="History">
+
+                        <i class="bi bi-clock-history"></i>
+
+                        Subject History
+
+                    </button>
+
+                    <button class="btn btn-light"
+                            @onclick="AddSubject">
+
+                        <i class="bi bi-plus-circle"></i>
+
+                        Add Subject
+
+                    </button>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        @if (loading)
+        {
+            <div class="text-center py-5">
+
+                <div class="spinner-border text-primary"></div>
+
+                <p class="mt-3">
+
+                    Loading Subjects...
+
+                </p>
+
+            </div>
+        }
+        else if (!subjects.Any())
+        {
+            <div class="alert alert-warning">
+
+                No Subjects Found.
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th width="170">
+
+                                Subject Code
+
+                            </th>
+
+                            <th>
+
+                                Subject Name
+
+                            </th>
+
+                            <th width="110">
+
+                                Status
+
+                            </th>
+
+                            @if (isAdmin)
+                            {
+                                <th width="180">
+
+                                    Action
+
+                                </th>
+                            }
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in subjects)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <span class="badge bg-primary">
+
+                                        @item.SubjectCode
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    @item.SubjectName
+
+                                </td>
+
+                                <td>
+
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+                                @if (isAdmin)
+                                {
+                                    <td>
+
+                                        <button class="btn btn-warning btn-sm"
+                                                @onclick="() => EditSubject(item.Id)">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                            Edit
+
+                                        </button>
+
+                                        <button class="btn btn-danger btn-sm ms-2"
+                                                @onclick="() => InactiveSubject(item.Id)">
+
+                                            <i class="bi bi-x-circle"></i>
+
+                                            Remove
+
+                                        </button>
+
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+    <div class="card-footer">
+
+        <Pagination CurrentPage="@CurrentPage"
+                    TotalPages="@TotalPages"
+                    TotalRecords="@TotalRecords"
+                    PageSize="@PageSize"
+                    OnPageChanged="LoadPage"
+                    OnPageSizeChanged="ChangePageSize" />
+
+    </div>
+
+</div>
+
+@code {
+
+    private List<Subject> subjects = new();
+
+    private bool loading = true;
+
+    private bool isAdmin;
+
+    private int CurrentPage = 1;
+
+    private int PageSize = 15;
+
+    private int TotalPages;
+
+    private int TotalRecords;
+
+    private string searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState =
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        isAdmin =
+            authState.User.IsInRole(Roles.Admin);
+
+        await LoadSubjects();
+    }
+
+    private async Task LoadSubjects()
+    {
+        loading = true;
+
+        StateHasChanged();
+
+        try
+        {
+            var result = await SubjectService.GetPagedSubjectsAsync(
+                CurrentPage,
+                PageSize,
+                string.IsNullOrWhiteSpace(searchText)
+                    ? null
+                    : searchText);
+
+            subjects = result.Items.ToList();
+
+            TotalPages = result.TotalPages;
+
+            TotalRecords = result.TotalRecords;
+        }
+        finally
+        {
+            loading = false;
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadPage(int page)
+    {
+        CurrentPage = page;
+
+        await LoadSubjects();
+    }
+
+    private async Task ChangePageSize(int size)
+    {
+        PageSize = size;
+
+        CurrentPage = 1;
+
+        await LoadSubjects();
+    }
+
+    private async Task OnSearchChanged(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? "";
+
+        CurrentPage = 1;
+
+        await LoadSubjects();
+    }
+
+    private void AddSubject()
+    {
+        Navigation.NavigateTo("/subjects/add");
+    }
+
+    private void EditSubject(int id)
+    {
+        Navigation.NavigateTo($"/subjects/edit/{id}");
+    }
+
+    private void InactiveSubject(int id)
+    {
+        Navigation.NavigateTo($"/subjects/inactive/{id}");
+    }
+
+    private void History()
+    {
+        Navigation.NavigateTo("/subjects/history");
+    }
+
+}

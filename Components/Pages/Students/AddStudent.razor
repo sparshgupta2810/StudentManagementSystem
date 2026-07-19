@@ -1,0 +1,439 @@
+﻿@page "/students/add"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = $"{Roles.Admin},{Roles.Teacher}")]
+
+@inject StudentService StudentService
+@inject DepartmentService DepartmentService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Student</PageTitle>
+
+<div class="card card-success shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Add Student
+
+        </h3>
+
+    </div>
+
+    <EditForm Model="student"
+              OnValidSubmit="SaveStudent">
+
+        <DataAnnotationsValidator />
+
+        <ValidationSummary class="text-danger" />
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <!-- Registration -->
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Registration Number
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.RegistrationNo" />
+
+                        <ValidationMessage For="@(() => student.RegistrationNo)" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Name -->
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            First Name
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.FirstName" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Middle Name
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.MiddleName" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Last Name
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.LastName" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Contact -->
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Email
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.Email" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Phone Number
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="student.PhoneNumber" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Gender & Department -->
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Gender
+
+                        </label>
+
+                        <InputSelect class="form-select"
+                                     @bind-Value="student.Gender">
+
+                            <option value="">Select Gender</option>
+
+                            <option>Male</option>
+
+                            <option>Female</option>
+
+                            <option>Other</option>
+
+                        </InputSelect>
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Department
+
+                        </label>
+
+                        <InputSelect class="form-select"
+                                     @bind-Value="student.DepartmentId">
+
+                            <option value="0">
+
+                                Select Department
+
+                            </option>
+
+                            @foreach (var department in departments)
+                            {
+                                <option value="@department.Id">
+
+                                    @department.DepartmentName
+
+                                </option>
+                            }
+
+                        </InputSelect>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Dates -->
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Date Of Birth
+
+                        </label>
+
+                        <InputDate class="form-control"
+                                   @bind-Value="student.DateOfBirth" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Admission Date
+
+                        </label>
+
+                        <InputDate class="form-control"
+                                   @bind-Value="student.AdmissionDate" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Address -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+
+                    Address
+
+                </label>
+
+                <InputTextArea class="form-control"
+                               rows="3"
+                               @bind-Value="student.Address" />
+
+            </div>
+
+            <!-- Active -->
+
+            <div class="form-check">
+
+                <InputCheckbox class="form-check-input"
+                               @bind-Value="student.IsActive" />
+
+                <label class="form-check-label">
+
+                    Student Active
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button class="btn btn-success"
+                    type="submit"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-check-circle"></i>
+
+                Save
+
+            </button>
+
+            <button class="btn btn-warning ms-2"
+                    type="reset">
+
+                <i class="bi bi-arrow-clockwise"></i>
+
+                Reset
+
+            </button>
+
+            <button class="btn btn-secondary ms-2"
+                    type="button"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Back
+
+            </button>
+
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+
+    private Student student = new()
+    {
+        IsActive = true,
+        DateOfBirth = DateTime.Today.AddYears(-18),
+        AdmissionDate = DateTime.Today
+    };
+
+    private List<Department> departments = new();
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDepartments();
+    }
+
+    private async Task LoadDepartments()
+    {
+        departments = (await DepartmentService
+            .GetAllDepartmentsAsync())
+            .OrderBy(d => d.DepartmentName)
+            .ToList();
+    }
+
+    private async Task SaveStudent()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            if (student.DepartmentId == 0)
+            {
+                error = "Please select a Department.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(student.Gender))
+            {
+                error = "Please select Gender.";
+                return;
+            }
+
+            await StudentService.AddStudentAsync(student);
+
+            message = "Student added successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/students");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/students");
+    }
+
+}

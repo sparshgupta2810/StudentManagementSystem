@@ -1,0 +1,247 @@
+﻿@page "/teachers/inactive/{Id:int}"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin)]
+
+@inject TeacherService TeacherService
+@inject NavigationManager Navigation
+
+<PageTitle>Inactive Teacher</PageTitle>
+
+<div class="card card-danger shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-person-x-fill"></i>
+
+            Make Teacher Inactive
+
+        </h3>
+
+    </div>
+
+    @if (loading)
+    {
+        <div class="card-body text-center p-5">
+
+            <div class="spinner-border text-danger"></div>
+
+            <p class="mt-3">
+
+                Loading Teacher...
+
+            </p>
+
+        </div>
+    }
+    else if (teacher == null)
+    {
+        <div class="card-body">
+
+            <div class="alert alert-danger">
+
+                Teacher not found.
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <div class="alert alert-warning">
+
+                <h5>
+
+                    Are you sure you want to make this teacher inactive?
+
+                </h5>
+
+                <hr />
+
+                <p>
+
+                    <strong>Name :</strong>
+
+                    @teacher.FirstName
+                    @teacher.MiddleName
+                    @teacher.LastName
+
+                </p>
+
+                <p>
+
+                    <strong>Department :</strong>
+
+                    @teacher.DepartmentName
+
+                </p>
+
+                <p>
+
+                    <strong>Email :</strong>
+
+                    @teacher.Email
+
+                </p>
+
+                <p>
+
+                    <strong>Phone :</strong>
+
+                    @teacher.PhoneNumber
+
+                </p>
+
+                <p>
+
+                    <strong>Qualification :</strong>
+
+                    @teacher.Qualification
+
+                </p>
+
+                <hr />
+
+                <p class="text-danger mb-0">
+
+                    This teacher will be moved to
+                    <strong>Teacher History</strong>.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button class="btn btn-danger"
+                    @onclick="MakeInactive"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-person-x-fill"></i>
+
+                Make Inactive
+
+            </button>
+
+            <button class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Cancel
+
+            </button>
+
+        </div>
+
+    }
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Teacher? teacher;
+
+    private bool loading = true;
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTeacher();
+    }
+
+    private async Task LoadTeacher()
+    {
+        loading = true;
+
+        teacher = await TeacherService.GetTeacherByIdAsync(Id);
+
+        loading = false;
+    }
+
+    private async Task MakeInactive()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            if (teacher == null)
+            {
+                error = "Teacher not found.";
+                return;
+            }
+
+            await TeacherService.InactivateTeacherAsync(Id);
+
+            message = "Teacher moved to history successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/teachers");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/teachers");
+    }
+
+}

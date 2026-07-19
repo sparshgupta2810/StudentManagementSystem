@@ -1,0 +1,107 @@
+/* CSS for LibraryProgress component */
+.library-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    border: 1px solid #eef2f7;
+    height: 100%;
+}
+
+.library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+    .library-header h4 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .library-header span {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+.library-percent {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#4F46E5,#2563EB);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.progress-section {
+    margin-bottom: 30px;
+}
+
+.library-progress {
+    height: 16px;
+    background: #edf2f7;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.library-fill {
+    height: 100%;
+    border-radius: 30px;
+    background: linear-gradient(90deg,#4F46E5,#2563EB);
+    transition: width .8s ease;
+}
+
+.progress-label {
+    text-align: center;
+    margin-top: 12px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.library-stats {
+    display: grid;
+    gap: 18px;
+}
+
+.stat-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+}
+
+    .stat-box i {
+        font-size: 24px;
+        width: 42px;
+        text-align: center;
+    }
+
+    .stat-box span {
+        color: #6c757d;
+        font-size: 13px;
+    }
+
+    .stat-box h5 {
+        margin: 2px 0 0;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+.library-percent.success {
+    background: linear-gradient(135deg,#10B981,#34D399);
+}
+
+.library-percent.warning {
+    background: linear-gradient(135deg,#F59E0B,#FBBF24);
+}
+
+.library-percent.danger {
+    background: linear-gradient(135deg,#EF4444,#F87171);
+}

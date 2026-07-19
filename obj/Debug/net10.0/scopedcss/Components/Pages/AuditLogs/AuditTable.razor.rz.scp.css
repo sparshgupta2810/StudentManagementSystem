@@ -1,0 +1,26 @@
+/* CSS for AuditTable component */
+.audit-table[b-bzc81yklyr] {
+    margin-bottom: 0;
+}
+
+    .audit-table thead[b-bzc81yklyr] {
+        background: #f8f9fa;
+    }
+
+    .audit-table th[b-bzc81yklyr] {
+        font-size: .85rem;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .audit-table tbody tr[b-bzc81yklyr] {
+        transition: .25s;
+    }
+
+        .audit-table tbody tr:hover[b-bzc81yklyr] {
+            background: #eef6ff;
+        }
+
+    .audit-table td[b-bzc81yklyr] {
+        vertical-align: middle;
+    }

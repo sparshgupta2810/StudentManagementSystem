@@ -1,0 +1,242 @@
+﻿@page "/subjects/edit/{Id:int}"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin)]
+
+@inject SubjectService SubjectService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Subject</PageTitle>
+
+<div class="card card-warning shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-pencil-square"></i>
+
+            Edit Subject
+
+        </h3>
+
+    </div>
+
+    @if (loading)
+    {
+        <div class="card-body text-center p-5">
+
+            <div class="spinner-border text-warning"></div>
+
+            <p class="mt-3">
+
+                Loading Subject...
+
+            </p>
+
+        </div>
+    }
+    else if (subject == null)
+    {
+        <div class="card-body">
+
+            <div class="alert alert-danger">
+
+                Subject not found.
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <EditForm Model="subject"
+                  OnValidSubmit="UpdateSubject">
+
+            <DataAnnotationsValidator />
+
+            <ValidationSummary class="text-danger" />
+
+            <div class="card-body">
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <div class="alert alert-success">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        @message
+
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(error))
+                {
+                    <div class="alert alert-danger">
+
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+
+                        @error
+
+                    </div>
+                }
+
+                <div class="row">
+
+                    <div class="col-md-4">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Subject Code
+
+                            </label>
+
+                            <InputText class="form-control"
+                                       @bind-Value="subject.SubjectCode" />
+
+                            <ValidationMessage For="@(() => subject.SubjectCode)"
+                                               class="text-danger" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-8">
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+
+                                Subject Name
+
+                            </label>
+
+                            <InputText class="form-control"
+                                       @bind-Value="subject.SubjectName" />
+
+                            <ValidationMessage For="@(() => subject.SubjectName)"
+                                               class="text-danger" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="form-check mt-2">
+
+                    <InputCheckbox class="form-check-input"
+                                   @bind-Value="subject.IsActive" />
+
+                    <label class="form-check-label">
+
+                        Subject Active
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="card-footer">
+
+                <button type="submit"
+                        class="btn btn-warning"
+                        disabled="@saving">
+
+                    @if (saving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+
+                    <i class="bi bi-save"></i>
+
+                    Update
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-secondary ms-2"
+                        @onclick="Back">
+
+                    <i class="bi bi-arrow-left-circle"></i>
+
+                    Back
+
+                </button>
+
+            </div>
+
+        </EditForm>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Subject? subject;
+
+    private bool loading = true;
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSubject();
+    }
+
+    private async Task LoadSubject()
+    {
+        loading = true;
+
+        subject = await SubjectService.GetSubjectByIdAsync(Id);
+
+        loading = false;
+    }
+
+    private async Task UpdateSubject()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            await SubjectService.UpdateSubjectAsync(subject!);
+
+            message = "Subject updated successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/subjects");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/subjects");
+    }
+
+}

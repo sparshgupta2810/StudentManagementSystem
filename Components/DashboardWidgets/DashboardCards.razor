@@ -1,0 +1,56 @@
+﻿@using StudentManagementSystemApp.Models
+
+<div class="row">
+
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+
+        <DashboardCard
+            Title="Students"
+            Value="@Dashboard.TotalStudents"
+            Subtitle="Active Students"
+            Icon="fas fa-user-graduate"
+            Color="primary" />
+
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+
+        <DashboardCard
+            Title="Teachers"
+            Value="@Dashboard.TotalTeachers"
+            Subtitle="Active Teachers"
+            Icon="fas fa-chalkboard-teacher"
+            Color="success" />
+
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+
+        <DashboardCard
+            Title="Departments"
+            Value="@Dashboard.TotalDepartments"
+            Subtitle="Departments"
+            Icon="fas fa-building"
+            Color="warning" />
+
+    </div>
+
+    <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+
+        <DashboardCard
+            Title="Books"
+            Value="@Dashboard.TotalBooks"
+            Subtitle="Library Books"
+            Icon="fas fa-book"
+            Color="danger" />
+
+    </div>
+
+</div>
+
+@code{
+
+    [Parameter]
+    public DashboardDto Dashboard { get; set; } = new();
+
+}

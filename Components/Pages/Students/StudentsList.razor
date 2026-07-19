@@ -1,0 +1,365 @@
+﻿@page "/students"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize]
+
+@inject StudentService StudentService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>Students</PageTitle>
+
+<div class="card card-primary shadow">
+
+    <div class="card-header">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <h3 class="card-title mb-2 mb-md-0">
+
+                <i class="bi bi-mortarboard-fill"></i>
+
+                Students
+
+            </h3>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                <input class="form-control"
+                       style="width:320px"
+                       placeholder="Search Registration No, Name, Email or Department..."
+                       value="@searchText"
+                       @oninput="OnSearchChanged" />
+
+                <button class="btn btn-secondary"
+                        @onclick="History">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Student History
+
+                </button>
+
+                @if (canManage)
+                {
+                    <button class="btn btn-light"
+                            @onclick="AddStudent">
+
+                        <i class="bi bi-plus-circle"></i>
+
+                        Add Student
+
+                    </button>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card-body">
+
+        @if (loading)
+        {
+            <div class="text-center p-5">
+
+                <div class="spinner-border text-primary"></div>
+
+                <p class="mt-3">
+
+                    Loading Students...
+
+                </p>
+
+            </div>
+        }
+        else if (!students.Any())
+        {
+            <div class="alert alert-warning">
+
+                No Students Found.
+
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th width="140">
+
+                                Registration No
+
+                            </th>
+
+                            <th>
+
+                                Student Name
+
+                            </th>
+
+                            <th>
+
+                                Department
+
+                            </th>
+
+                            <th>
+
+                                Email
+
+                            </th>
+
+                            <th width="130">
+
+                                Admission Date
+
+                            </th>
+
+                            <th width="100">
+
+                                Status
+
+                            </th>
+
+                            @if (canManage)
+                            {
+                                <th width="220">
+
+                                    Action
+
+                                </th>
+                            }
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in students)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <span class="badge bg-primary">
+
+                                        @item.RegistrationNo
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    <strong>
+
+                                        @item.FirstName
+                                        @item.MiddleName
+                                        @item.LastName
+
+                                    </strong>
+
+                                </td>
+
+                                <td>
+
+                                    @item.DepartmentName
+
+                                </td>
+
+                                <td>
+
+                                    @item.Email
+
+                                </td>
+
+                                <td>
+
+                                    @item.AdmissionDate.ToShortDateString()
+
+                                </td>
+
+                                <td>
+
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">
+
+                                            Active
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">
+
+                                            Inactive
+
+                                        </span>
+                                    }
+
+                                </td>
+
+                                @if (canManage)
+                                {
+                                    <td>
+
+                                        <button class="btn btn-warning btn-sm"
+                                                @onclick="() => EditStudent(item.Id)">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                            Edit
+
+                                        </button>
+
+                                        <button class="btn btn-danger btn-sm ms-2"
+                                                @onclick="() => InactiveStudent(item.Id)">
+
+                                            <i class="bi bi-person-x-fill"></i>
+
+                                            Remove
+
+                                        </button>
+
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+
+    </div>
+
+    <div class="card-footer">
+
+        <Pagination CurrentPage="@CurrentPage"
+                    TotalPages="@TotalPages"
+                    TotalRecords="@TotalRecords"
+                    PageSize="@PageSize"
+                    OnPageChanged="LoadPage"
+                    OnPageSizeChanged="ChangePageSize" />
+
+    </div>
+
+</div>
+
+@code {
+
+    private List<Student> students = new();
+
+    private bool loading = true;
+
+    private bool canManage = false;
+
+    private int CurrentPage = 1;
+
+    private int PageSize = 15;
+
+    private int TotalPages;
+
+    private int TotalRecords;
+
+    private string searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState =
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        canManage =
+            authState.User.IsInRole(Roles.Admin)
+            || authState.User.IsInRole(Roles.Teacher);
+
+        await LoadStudents();
+    }
+
+    private async Task LoadStudents()
+    {
+        loading = true;
+
+        StateHasChanged();
+
+        var result = await StudentService.GetPagedStudentsAsync(
+            CurrentPage,
+            PageSize,
+            string.IsNullOrWhiteSpace(searchText)
+                ? null
+                : searchText);
+
+        students = result.Items.ToList();
+
+        TotalPages = result.TotalPages;
+
+        TotalRecords = result.TotalRecords;
+
+        loading = false;
+
+        StateHasChanged();
+    }
+
+    private async Task LoadPage(int page)
+    {
+        CurrentPage = page;
+
+        await LoadStudents();
+    }
+
+    private async Task ChangePageSize(int size)
+    {
+        PageSize = size;
+
+        CurrentPage = 1;
+
+        await LoadStudents();
+    }
+
+    private async Task OnSearchChanged(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+
+        CurrentPage = 1;
+
+        await LoadStudents();
+    }
+
+    private void AddStudent()
+    {
+        Navigation.NavigateTo("/students/add");
+    }
+
+    private void EditStudent(int id)
+    {
+        Navigation.NavigateTo($"/students/edit/{id}");
+    }
+
+    private void InactiveStudent(int id)
+    {
+        Navigation.NavigateTo($"/students/inactive/{id}");
+    }
+
+    private void History()
+    {
+        Navigation.NavigateTo("/students/history");
+    }
+
+}

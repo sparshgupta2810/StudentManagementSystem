@@ -1,0 +1,340 @@
+﻿@page "/users/edit/{Id}"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = "Admin")]
+
+@inject UserManagementService UserManagementService
+@inject NavigationManager Navigation
+
+<PageTitle>Edit User Role</PageTitle>
+
+<div class="card card-warning shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-person-gear"></i>
+
+            Edit User Role
+
+        </h3>
+
+    </div>
+
+    @if (loading)
+    {
+        <div class="card-body text-center p-5">
+
+            <div class="spinner-border text-warning"></div>
+
+            <p class="mt-3">
+
+                Loading User...
+
+            </p>
+
+        </div>
+    }
+    else if (user == null)
+    {
+        <div class="card-body">
+
+            <div class="alert alert-danger">
+
+                User not found.
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    @error
+
+                </div>
+            }
+
+            @if (user.IsAdmin)
+            {
+                <div class="alert alert-warning">
+
+                    <h5>
+
+                        <i class="bi bi-shield-lock-fill"></i>
+
+                        Administrator Account
+
+                    </h5>
+
+                    <hr />
+
+                    This account is protected.
+
+                    <br />
+
+                    Another administrator cannot modify the role of this user.
+
+                </div>
+            }
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        User Name
+
+                    </label>
+
+                    <input class="form-control"
+                           value="@user.UserName"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Full Name
+
+                    </label>
+
+                    <input class="form-control"
+                           value="@user.FullName"
+                           readonly />
+
+                </div>
+
+            </div>
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Email
+
+                    </label>
+
+                    <input class="form-control"
+                           value="@user.Email"
+                           readonly />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Current Role
+
+                    </label>
+
+                    <input class="form-control"
+                           value="@user.CurrentRole"
+                           readonly />
+
+                </div>
+
+            </div>
+
+            <div class="row mt-4">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        New Role
+
+                    </label>
+
+                    <InputSelect class="form-select"
+                                 @bind-Value="selectedRole"
+                                 disabled="@user.IsAdmin">
+
+                        <option value="User">
+
+                            User
+
+                        </option>
+
+                        <option value="Teacher">
+
+                            Teacher
+
+                        </option>
+
+                        <option value="Librarian">
+
+                            Librarian
+
+                        </option>
+
+                        <option value="Admin">
+
+                            Admin
+
+                        </option>
+
+                    </InputSelect>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            @if (!user.IsAdmin)
+            {
+                <button class="btn btn-warning"
+                        @onclick="SaveRole"
+                        disabled="@saving">
+
+                    @if (saving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+
+                    <i class="bi bi-save"></i>
+
+                    Update Role
+
+                </button>
+            }
+
+            <button class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Back
+
+            </button>
+
+        </div>
+
+    }
+
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private UserManagementViewModel? user;
+
+    private bool loading = true;
+
+    private bool saving;
+
+    private string selectedRole = string.Empty;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUser();
+    }
+
+    private async Task LoadUser()
+    {
+        loading = true;
+
+        user = await UserManagementService.GetUserByIdAsync(Id);
+
+        if (user != null)
+        {
+            selectedRole = user.CurrentRole;
+        }
+
+        loading = false;
+    }
+
+    private async Task SaveRole()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            if (user == null)
+            {
+                error = "User not found.";
+                return;
+            }
+
+            if (user.IsAdmin)
+            {
+                error = "Administrator accounts cannot be modified.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(selectedRole))
+            {
+                error = "Please select a role.";
+                return;
+            }
+
+            var result = await UserManagementService.UpdateRoleAsync(
+                user.Id,
+                selectedRole);
+
+            if (!result)
+            {
+                error = "Unable to update the user role.";
+                return;
+            }
+
+            message = "User role updated successfully.";
+
+            await Task.Delay(1000);
+
+            Navigation.NavigateTo("/users");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/users");
+    }
+
+}

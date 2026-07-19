@@ -1,0 +1,315 @@
+﻿@page "/Account/Login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using StudentManagementSystemApp.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Log in</PageTitle>
+
+<div class="auth-wrapper">
+
+    <div class="auth-container">
+
+        <!-- LOGIN PANEL -->
+
+        <div class="auth-form-panel">
+
+            <div class="auth-form">
+
+                <h2>Welcome Back 👋</h2>
+
+                <p class="subtitle">
+                    Sign in to continue to your dashboard.
+                </p>
+
+                <StatusMessage Message="@errorMessage" />
+
+                <EditForm EditContext="editContext"
+                          Method="post"
+                          OnSubmit="LoginUser"
+                          FormName="login">
+
+                    <DataAnnotationsValidator />
+
+                    <ValidationSummary class="text-danger mb-3" />
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Email Address
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText class="form-control"
+                                       @bind-Value="Input.Email"
+                                       placeholder="Enter your email" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-envelope-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage For="() => Input.Email"
+                                           class="text-danger" />
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+
+                            Password
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText type="password"
+                                       class="form-control"
+                                       @bind-Value="Input.Password"
+                                       placeholder="Enter password" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-lock-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage For="() => Input.Password"
+                                           class="text-danger" />
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <div class="form-check">
+
+                            <InputCheckbox class="form-check-input"
+                                           @bind-Value="Input.RememberMe" />
+
+                            <label class="form-check-label ms-1">
+
+                                Remember Me
+
+                            </label>
+
+                        </div>
+
+                        <a href="/Account/ForgotPassword">
+
+                            Forgot Password?
+
+                        </a>
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-primary w-100 btn-lg">
+
+                        <i class="bi bi-box-arrow-in-right me-2"></i>
+
+                        Login
+
+                    </button>
+
+                </EditForm>
+
+                <div class="text-center mt-4">
+
+                    <span class="text-muted">
+
+                        Don't have an account?
+
+                    </span>
+
+                    <br />
+
+                    <a href="@NavigationManager.GetUriWithQueryParameters("Account/Register",
+                        new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl })">
+
+                        Register Here
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- INFO PANEL -->
+
+        <div class="auth-info-panel">
+
+            <div class="auth-info-content">
+
+                <div class="logo-circle">
+
+                    <i class="bi bi-mortarboard-fill"></i>
+
+                </div>
+
+                <h1>
+
+                    Institute Management System
+
+                </h1>
+
+                <p>
+
+                    A centralized platform to manage students,
+                    teachers, departments, subjects and library
+                    resources efficiently.
+
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Student Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Teacher Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Library Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Secure Role-Based Authentication
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    private string? errorMessage;
+    private EditContext editContext = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+
+        editContext = new EditContext(Input);
+
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    public async Task LoginUser()
+    {
+        if (!string.IsNullOrEmpty(Input.Passkey?.Error))
+        {
+            errorMessage = $"Error: {Input.Passkey.Error}";
+            return;
+        }
+
+        SignInResult result;
+        if (!string.IsNullOrEmpty(Input.Passkey?.CredentialJson))
+        {
+            // When performing passkey sign-in, don't perform form validation.
+            result = await SignInManager.PasskeySignInAsync(Input.Passkey.CredentialJson);
+        }
+        else
+        {
+            // If doing a password sign-in, validate the form.
+            if (!editContext.Validate())
+            {
+                return;
+            }
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+            result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        }
+
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("User account locked out.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
+
+        public PasskeyInputModel? Passkey { get; set; }
+    }
+}

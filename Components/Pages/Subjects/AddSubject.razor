@@ -1,0 +1,206 @@
+﻿@page "/subjects/add"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin)]
+
+@inject SubjectService SubjectService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Subject</PageTitle>
+
+<div class="card card-success shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-book-fill"></i>
+
+            Add Subject
+
+        </h3>
+
+    </div>
+
+    <EditForm Model="@subject"
+              OnValidSubmit="SaveSubject">
+
+        <DataAnnotationsValidator />
+
+        <ValidationSummary class="text-danger" />
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Subject Code
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="subject.SubjectCode" />
+
+                        <ValidationMessage For="@(() => subject.SubjectCode)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            Subject Name
+
+                        </label>
+
+                        <InputText class="form-control"
+                                   @bind-Value="subject.SubjectName" />
+
+                        <ValidationMessage For="@(() => subject.SubjectName)"
+                                           class="text-danger" />
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-check mt-2">
+
+                <InputCheckbox class="form-check-input"
+                               @bind-Value="subject.IsActive" />
+
+                <label class="form-check-label">
+
+                    Subject Active
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button class="btn btn-success"
+                    type="submit"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-check-circle"></i>
+
+                Save
+
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Back
+
+            </button>
+
+            <button type="reset"
+                    class="btn btn-warning ms-2">
+
+                <i class="bi bi-arrow-clockwise"></i>
+
+                Reset
+
+            </button>
+
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+
+    private Subject subject = new()
+    {
+        IsActive = true
+    };
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    private async Task SaveSubject()
+    {
+        try
+        {
+            saving = true;
+
+            message = "";
+            error = "";
+
+            await SubjectService.AddSubjectAsync(subject);
+
+            message = "Subject added successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/subjects");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/subjects");
+    }
+
+}

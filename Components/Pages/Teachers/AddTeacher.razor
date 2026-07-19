@@ -1,0 +1,401 @@
+﻿@page "/teachers/add"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin)]
+
+@inject TeacherService TeacherService
+@inject DepartmentService DepartmentService
+@inject NavigationManager Navigation
+
+<PageTitle>Add Teacher</PageTitle>
+
+<div class="card card-primary shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Add Teacher
+
+        </h3>
+
+    </div>
+
+    <EditForm Model="teacher"
+              OnValidSubmit="SaveTeacher">
+
+        <DataAnnotationsValidator />
+
+        <ValidationSummary class="text-danger" />
+
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <!-- Teacher Name -->
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+
+                        First Name
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.FirstName" />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+
+                        Middle Name
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.MiddleName" />
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+
+                        Last Name
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.LastName" />
+
+                </div>
+
+            </div>
+
+            <!-- Email & Phone -->
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Email
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.Email" />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Phone Number
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.PhoneNumber" />
+
+                </div>
+
+            </div>
+
+            <!-- Gender & Department -->
+
+            <div class="row mt-3">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">
+
+                        Gender
+
+                    </label>
+
+                    <InputSelect class="form-select"
+                                 @bind-Value="teacher.Gender">
+
+                        <option value="">Select Gender</option>
+
+                        <option>Male</option>
+
+                        <option>Female</option>
+
+                        <option>Other</option>
+
+                    </InputSelect>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <label class="form-label">
+
+                        Department
+
+                    </label>
+
+                    <InputSelect class="form-select"
+                                 @bind-Value="teacher.DepartmentId">
+
+                        <option value="0">
+
+                            Select Department
+
+                        </option>
+
+                        @foreach (var department in departments)
+                        {
+                            <option value="@department.Id">
+
+                                @department.DepartmentName
+
+                            </option>
+                        }
+
+                    </InputSelect>
+
+                </div>
+
+            </div>
+
+            <!-- Dates -->
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Date Of Birth
+
+                    </label>
+
+                    <InputDate class="form-control"
+                               @bind-Value="teacher.DateOfBirth" />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Joining Date
+
+                    </label>
+
+                    <InputDate class="form-control"
+                               @bind-Value="teacher.JoiningDate" />
+
+                </div>
+
+            </div>
+
+            <!-- Qualification -->
+
+            <div class="row mt-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Qualification
+
+                    </label>
+
+                    <InputText class="form-control"
+                               @bind-Value="teacher.Qualification" />
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Experience (Years)
+
+                    </label>
+
+                    <InputNumber class="form-control"
+                                 @bind-Value="teacher.Experience" />
+
+                </div>
+
+            </div>
+
+            <!-- Address -->
+
+            <div class="mt-3">
+
+                <label class="form-label">
+
+                    Address
+
+                </label>
+
+                <InputTextArea class="form-control"
+                               rows="3"
+                               @bind-Value="teacher.Address" />
+
+            </div>
+
+            <!-- Active -->
+
+            <div class="form-check mt-3">
+
+                <InputCheckbox class="form-check-input"
+                               @bind-Value="teacher.IsActive" />
+
+                <label class="form-check-label">
+
+                    Teacher Active
+
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button type="submit"
+                    class="btn btn-primary"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-save"></i>
+
+                Save Teacher
+
+            </button>
+
+            <button type="button"
+                    class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Back
+
+            </button>
+
+        </div>
+
+    </EditForm>
+
+</div>
+
+
+@code {
+
+    private Teacher teacher = new()
+    {
+        IsActive = true,
+        JoiningDate = DateTime.Today
+    };
+
+    private List<Department> departments = new();
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDepartments();
+    }
+
+    private async Task LoadDepartments()
+    {
+        departments = (await DepartmentService
+            .GetAllDepartmentsAsync())
+            .OrderBy(d => d.DepartmentName)
+            .ToList();
+    }
+
+    private async Task SaveTeacher()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            if (teacher.DepartmentId == 0)
+            {
+                error = "Please select a Department.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(teacher.Gender))
+            {
+                error = "Please select Gender.";
+                return;
+            }
+
+            await TeacherService.AddTeacherAsync(teacher);
+
+            message = "Teacher added successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/teachers");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/teachers");
+    }
+
+}

@@ -1,0 +1,432 @@
+﻿@implements IDisposable
+
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager NavigationManager
+
+<div class="sidebar-menu-custom">
+
+    <!-- DASHBOARD -->
+
+    <AuthorizeView Roles="Admin,Teacher,Librarian,User">
+
+        <NavLink href="/"
+                 Match="NavLinkMatch.All"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-speedometer2"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Dashboard
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <!-- MASTER -->
+     <AuthorizeView Roles="Admin,Teacher,User">
+         <div class="menu-heading">
+
+            MASTER
+
+        </div>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Admin,Teacher,User">
+
+        <NavLink href="/departments"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-building"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Departments
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Admin,Teacher,User">
+
+        <NavLink href="/subjects"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-book-fill"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Subjects
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    
+
+    <!-- PEOPLE -->
+    <AuthorizeView Roles="Admin,Teacher,Librarian,User">
+        <div class="menu-heading">
+
+            PEOPLE
+
+        </div>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin,Teacher,Librarian,User">
+
+        <NavLink href="/students"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-mortarboard-fill"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Students
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Admin,Teacher,User">
+
+        <NavLink href="/teachers"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-person-workspace"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Teachers
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <!-- LIBRARY -->
+    <AuthorizeView Roles="Admin,Teacher,User,Librarian">
+        <div class="menu-heading">
+
+            LIBRARY
+
+        </div>
+     </AuthorizeView>
+
+    <AuthorizeView Roles="Admin,Librarian,User">
+
+        <NavLink href="/books"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-book-half"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Books
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Admin,Librarian">
+
+        <NavLink href="/bookissues"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-journal-arrow-up"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Book Issues
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <!-- ADMINISTRATION -->
+
+    <AuthorizeView Roles="Admin">
+
+        <div class="menu-heading">
+
+            ADMINISTRATION
+
+        </div>
+
+        <NavLink href="/users"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                User Role
+
+            </div>
+
+        </NavLink>
+
+        <NavLink href="/auditlogs"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Audit Logs
+
+            </div>
+
+        </NavLink>
+
+        <NavLink href="/notification-logs"
+                 class="menu-link">
+
+            <div class="icon-box">
+
+                <i class="bi bi-envelope-paper"></i>
+
+            </div>
+
+            <div class="text-box">
+
+                Notification Logs
+
+            </div>
+
+        </NavLink>
+
+    </AuthorizeView>
+
+    <!-- ACCOUNT -->
+
+    <div class="menu-heading">
+
+        ACCOUNT
+
+    </div>
+
+    <AuthorizeView>
+
+        <Authorized>
+
+            <form action="Account/Logout"
+      method="post">
+
+    <AntiforgeryToken />
+
+    <input type="hidden"
+           name="ReturnUrl"
+           value="@currentUrl" />
+
+    <button type="submit"
+            class="menu-link border-0 bg-transparent w-100">
+
+        <div class="icon-box">
+
+            <i class="bi bi-box-arrow-right"></i>
+
+        </div>
+
+        <div class="text-box">
+
+            Logout
+
+        </div>
+
+    </button>
+
+</form>
+
+
+
+        </Authorized>
+
+    </AuthorizeView>
+
+</div>
+
+@code {
+
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+
+        NavigationManager.LocationChanged += LocationChanged;
+    }
+
+    private void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= LocationChanged;
+    }
+
+}
+
+<style>
+    
+/* ==============================
+       Sidebar
+    ================================= */
+.sidebar-menu-custom {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+/* ==============================
+       Section Heading
+    ================================= */
+
+.menu-heading {
+    margin: 18px 14px 8px;
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    height: 50px;
+    padding: 0 14px;
+    margin-bottom: 4px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #c2c7d0;
+    transition: all .25s ease;
+}
+
+    .menu-link:hover {
+        background: rgba(255,255,255,.08);
+        color: #fff;
+        text-decoration: none;
+    }
+
+
+    .menu-link.active {
+        background: #0d6efd;
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(13,110,253,.35);
+    }
+
+
+.icon-box {
+    width: 28px;
+    min-width: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .icon-box i {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+
+.text-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+
+.menu-link.active .icon-box {
+    transform: scale(1.08);
+}
+
+.menu-link:hover .icon-box {
+    transform: scale(1.08);
+}
+
+
+button.menu-link {
+    width: 100%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+}
+
+.sidebar-wrapper {
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+    .sidebar-wrapper::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,.2);
+        border-radius: 10px;
+    }
+
+
+
+</style>
+

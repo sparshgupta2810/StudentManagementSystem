@@ -1,0 +1,229 @@
+﻿@inherits LayoutComponentBase
+
+<div class="app-wrapper">
+
+    <!-- ===================== Navbar ===================== -->
+
+    <nav class="app-header navbar navbar-expand bg-body">
+
+        <div class="container-fluid">
+
+            <!-- Left Navbar -->
+
+            <ul class="navbar-nav">
+
+                <li class="nav-item">
+
+                    <a class="nav-link"
+                       data-lte-toggle="sidebar"
+                       href="#">
+
+                        <i class="bi bi-list"></i>
+
+                    </a>
+
+                </li>
+
+                <li class="nav-item d-none d-sm-inline-block">
+
+                    <NavLink class="nav-link"
+                             href="/dashboard">
+
+                        Dashboard
+
+                    </NavLink>
+
+                </li>
+
+            </ul>
+
+            <!-- ===================== Right Navbar ===================== -->
+
+            <ul class="navbar-nav ms-auto">
+
+                <AuthorizeView Context="auth">
+
+                    <Authorized>
+
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               data-bs-toggle="dropdown">
+
+                                <i class="bi bi-person-circle"></i>
+
+                                @auth.User.Identity?.Name
+
+                            </a>
+
+                            <ul class="dropdown-menu dropdown-menu-end">
+
+                                @if (auth.User.IsInRole("Admin"))
+                                {
+                                    <li>
+                                        <span class="dropdown-item-text">
+
+                                            Role :
+                                            <strong>Admin</strong>
+
+                                        </span>
+                                    </li>
+                                }
+
+                                @if (auth.User.IsInRole("Teacher"))
+                                {
+                                    <li>
+                                        <span class="dropdown-item-text">
+
+                                            Role :
+                                            <strong>Teacher</strong>
+
+                                        </span>
+                                    </li>
+                                }
+
+                                @if (auth.User.IsInRole("Librarian"))
+                                {
+                                    <li>
+                                        <span class="dropdown-item-text">
+
+                                            Role :
+                                            <strong>Librarian</strong>
+
+                                        </span>
+                                    </li>
+                                }
+
+                                @if (auth.User.IsInRole("User"))
+                                {
+                                    <li>
+                                        <span class="dropdown-item-text">
+
+                                            Role :
+                                            <strong>User</strong>
+
+                                        </span>
+                                    </li>
+                                }
+
+                                
+
+                            </ul>
+
+                        </li>
+
+                    </Authorized>
+
+                    <NotAuthorized>
+
+                        <li class="nav-item">
+
+                            <NavLink href="/account/login"
+                                     class="btn btn-primary">
+
+                                Login
+
+                            </NavLink>
+
+                        </li>
+
+                    </NotAuthorized>
+
+                </AuthorizeView>
+
+            </ul>
+
+        </div>
+
+    </nav>
+
+    <!-- ===================== Sidebar ===================== -->
+
+    <aside class="app-sidebar bg-body-secondary shadow"
+           data-bs-theme="dark">
+
+        <div class="sidebar-brand">
+
+            <a href="/"
+               class="brand-link">
+
+                <i class="bi bi-mortarboard-fill brand-image"></i>
+
+                <span class="brand-text fw-semibold">
+
+                    Institute Management
+
+                </span>
+
+            </a>
+
+        </div>
+
+        <div class="sidebar-wrapper">
+
+            <nav class="mt-2 ">
+
+                <NavMenu />
+
+            </nav>
+
+        </div>
+
+    </aside>
+
+    <!-- ===================== Main ===================== -->
+
+    <main class="app-main">
+
+        <div class="app-content">
+
+            <div class="container-fluid py-3">
+
+                @Body
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ===================== Footer ===================== -->
+
+    <footer class="app-footer">
+
+        <div class="float-end d-none d-sm-inline">
+
+            Institute Management System
+
+        </div>
+
+        <strong>
+
+            Copyright © 2026
+
+        </strong>
+
+    </footer>
+
+</div>
+
+<div id="blazor-error-ui"
+     data-nosnippet>
+
+    An unhandled error has occurred.
+
+    <a href=""
+       class="reload">
+
+        Reload
+
+    </a>
+
+    <span class="dismiss">
+
+        🗙
+
+    </span>
+
+</div>

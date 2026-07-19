@@ -1,0 +1,48 @@
+﻿<div class="dashboard-card @Color">
+
+    <div class="dashboard-card-header">
+
+        <div>
+
+            <span class="dashboard-card-title">
+                @Title
+            </span>
+
+            <div class="dashboard-card-value">
+                @Value
+            </div>
+
+            <span class="dashboard-card-subtitle">
+                @Subtitle
+            </span>
+
+        </div>
+
+        <div class="dashboard-card-icon">
+
+            <i class="@Icon"></i>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    [Parameter]
+    public int Value { get; set; }
+
+    [Parameter]
+    public string Subtitle { get; set; } = "";
+
+    [Parameter]
+    public string Icon { get; set; } = "";
+
+    [Parameter]
+    public string Color { get; set; } = "primary";
+
+}

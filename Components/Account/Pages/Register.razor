@@ -1,0 +1,384 @@
+﻿@page "/Account/Register"
+
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using StudentManagementSystemApp.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IUserStore<ApplicationUser> UserStore
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject ILogger<Register> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Register</PageTitle>
+
+<div class="auth-wrapper">
+
+    <div class="auth-container">
+
+        <!-- ================= LEFT PANEL ================= -->
+
+        <div class="auth-left register-theme">
+
+            <div class="auth-info-content">
+
+                <div class="logo-circle">
+
+                    <i class="bi bi-mortarboard-fill"></i>
+
+                </div>
+
+                <h1>
+
+                    Institute Management System
+
+                </h1>
+
+                <p>
+
+                    Join the Institute Management System and manage
+                    students, teachers, departments, subjects,
+                    books and institute operations from one place.
+
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Student Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Teacher Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Department & Subject Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Library Management
+
+                    </div>
+
+                    <div class="feature-item">
+
+                        <i class="bi bi-check-circle-fill"></i>
+
+                        Secure Role-Based Authentication
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= RIGHT PANEL ================= -->
+
+        <div class="auth-right">
+
+            <div class="auth-form">
+
+                <div class="mb-4 text-center">
+
+                    <h2>
+
+                        Create Account 🚀
+
+                    </h2>
+
+                    <p class="subtitle">
+
+                        Create your institute account to continue.
+
+                    </p>
+
+                </div>
+
+                <StatusMessage Message="@Message" />
+
+                <EditForm Model="Input"
+                          OnValidSubmit="RegisterUser"
+                          Method="post"
+                          FormName="register">
+
+                    <DataAnnotationsValidator />
+
+                    <ValidationSummary class="text-danger mb-3" />
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Full Name
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText class="form-control"
+                                       @bind-Value="Input.FullName"
+                                       placeholder="Enter Full Name" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-person-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage
+                            For="() => Input.FullName"
+                            class="text-danger" />
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Email Address
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText class="form-control"
+                                       @bind-Value="Input.Email"
+                                       placeholder="Enter Email Address" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-envelope-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage
+                            For="() => Input.Email"
+                            class="text-danger" />
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+
+                            Password
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText type="password"
+                                       class="form-control"
+                                       @bind-Value="Input.Password"
+                                       placeholder="Enter Password" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-lock-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage
+                            For="() => Input.Password"
+                            class="text-danger" />
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+
+                            Confirm Password
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <InputText type="password"
+                                       class="form-control"
+                                       @bind-Value="Input.ConfirmPassword"
+                                       placeholder="Confirm Password" />
+
+                            <span class="input-group-text">
+
+                                <i class="bi bi-shield-lock-fill"></i>
+
+                            </span>
+
+                        </div>
+
+                        <ValidationMessage
+                            For="() => Input.ConfirmPassword"
+                            class="text-danger" />
+
+                    </div>
+
+                    <button type="submit"
+                            class="btn btn-danger btn-lg w-100">
+
+                        <i class="bi bi-person-plus-fill me-2"></i>
+
+                        Create Account
+
+                    </button>
+
+                </EditForm>
+
+                <div class="text-center mt-4">
+
+                    <span class="text-muted">
+
+                        Already have an account?
+
+                    </span>
+
+                    <br />
+
+                    <a href="/Account/Login">
+
+                        Login Here
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+    private IEnumerable<IdentityError>? identityErrors;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+
+    protected override void OnInitialized()
+    {
+        Input ??= new();
+    }
+
+    public async Task RegisterUser(EditContext editContext)
+    {
+        var user = CreateUser();
+        user.FullName = Input.FullName;
+        await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+        var emailStore = GetEmailStore();
+        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, Input.Password);
+
+        if (!result.Succeeded)
+        {
+            identityErrors = result.Errors;
+            return;
+        }
+
+        // Automatically assign User role
+        await UserManager.AddToRoleAsync(user, "User");
+
+        Logger.LogInformation("User created a new account with password.");
+
+        var userId = await UserManager.GetUserIdAsync(user);
+        var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+        var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+            NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
+            new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
+
+        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+        if (UserManager.Options.SignIn.RequireConfirmedAccount)
+        {
+            RedirectManager.RedirectTo(
+                "Account/RegisterConfirmation",
+                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+        }
+        else
+        {
+            await SignInManager.SignInAsync(user, isPersistent: false);
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+    }
+
+    private ApplicationUser CreateUser()
+    {
+        try
+        {
+            return Activator.CreateInstance<ApplicationUser>();
+        }
+        catch
+        {
+            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
+        }
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [Display(Name = "Full Name")]
+        public string FullName { get; set; } = "";
+
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
+        public string Email { get; set; } = "";
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

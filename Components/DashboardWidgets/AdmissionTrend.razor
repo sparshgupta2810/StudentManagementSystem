@@ -1,0 +1,119 @@
+﻿@using StudentManagementSystemApp.Models
+
+<div class="trend-card">
+
+    @{
+        var admissions = Dashboard.YearlyAdmissions
+            .OrderBy(x => x.Year)
+            .ToList();
+
+        var max = admissions.Any()
+            ? admissions.Max(x => x.TotalStudents)
+            : 1;
+
+        var total = admissions.Sum(x => x.TotalStudents);
+    }
+
+    <div class="trend-header">
+
+        <div>
+
+            <h4>
+
+                <i class="fas fa-chart-line text-success me-2"></i>
+
+                Admission Trend
+
+            </h4>
+
+            <span>
+
+                Year Wise Admissions
+
+            </span>
+
+        </div>
+
+        <div class="trend-total">
+
+            <h3>@total</h3>
+
+            <small>Total Admissions</small>
+
+        </div>
+
+    </div>
+
+    <hr />
+
+    @if (admissions.Any())
+    {
+        @foreach (var item in admissions)
+        {
+            var width = max == 0
+                ? 0
+                : item.TotalStudents * 100 / max;
+
+            <div class="trend-item">
+
+                <div class="trend-top">
+
+                    <span class="year">
+
+                        @item.Year
+
+                    </span>
+
+                    <span class="count">
+
+                        @item.TotalStudents Students
+
+                    </span>
+
+                </div>
+
+                <div class="progress trend-progress">
+
+                    <div class="progress-bar"
+
+                         style="width:@width%;
+                                background:linear-gradient(90deg,#10B981,#34D399);">
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    }
+    else
+    {
+        <div class="trend-empty">
+
+            <i class="fas fa-chart-line fa-3x mb-3 text-muted"></i>
+
+            <h5>No Admission Data</h5>
+
+            <p>No records found.</p>
+
+        </div>
+    }
+
+    <div class="trend-footer">
+
+        <span>
+
+            Showing yearly admissions
+
+        </span>
+
+    </div>
+
+</div>
+
+@code{
+
+    [Parameter]
+    public DashboardDto Dashboard { get; set; } = new();
+
+}

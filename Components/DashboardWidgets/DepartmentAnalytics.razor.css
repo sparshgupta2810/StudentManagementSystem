@@ -1,0 +1,116 @@
+.department-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,.08);
+    border: 1px solid #eef2f7;
+}
+
+.department-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .department-header h4 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .department-header span {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+.department-total {
+    text-align: right;
+}
+
+    .department-total h3 {
+        margin: 0;
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    .department-total small {
+        color: #6c757d;
+    }
+
+.department-item {
+    margin: 22px 0;
+}
+
+.department-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.department-name {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.department-count {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.modern-progress {
+    height: 10px;
+    border-radius: 20px;
+    background: #edf2f7;
+    overflow: hidden;
+}
+
+    .modern-progress .progress-bar {
+        border-radius: 20px;
+        transition: all .8s ease;
+    }
+
+.department-bottom {
+    text-align: right;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.department-footer {
+    border-top: 1px solid #eef2f7;
+    margin-top: 20px;
+    padding-top: 15px;
+    text-align: right;
+}
+
+    .department-footer a {
+        text-decoration: none;
+        color: #2563eb;
+        font-weight: 600;
+    }
+
+        .department-footer a:hover {
+            color: #1d4ed8;
+        }
+
+.empty-state {
+    padding: 50px 20px;
+    text-align: center;
+    color: #6c757d;
+}

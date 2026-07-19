@@ -1,0 +1,87 @@
+﻿@using StudentManagementSystemApp.Models
+
+@if (Changes.Any())
+{
+    <div class="mt-4">
+
+        <h5>
+
+            <i class="bi bi-arrow-left-right me-2"></i>
+
+            Field Changes
+
+        </h5>
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Field</th>
+
+                    <th>Old</th>
+
+                    <th></th>
+
+                    <th>New</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Changes)
+                {
+                    <tr>
+
+                        <td>
+
+                            <strong>
+
+                                @item.Property
+
+                            </strong>
+
+                        </td>
+
+                        <td class="text-danger">
+
+                            @(string.IsNullOrWhiteSpace(item.OldValue)
+                                ? "-"
+                                : item.OldValue)
+
+                        </td>
+
+                        <td class="text-center">
+
+                            <i class="bi bi-arrow-right"></i>
+
+                        </td>
+
+                        <td class="text-success">
+
+                            @(string.IsNullOrWhiteSpace(item.NewValue)
+                                ? "-"
+                                : item.NewValue)
+
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+}
+
+@code{
+
+    [Parameter]
+
+    public List<AuditChange> Changes { get; set; } = [];
+
+}

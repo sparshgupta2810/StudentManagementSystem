@@ -1,0 +1,195 @@
+﻿
+
+
+@using StudentManagementSystemApp.Models
+
+<div class="table-responsive">
+
+    <table class="table table-hover align-middle audit-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Date</th>
+
+                <th>User</th>
+
+                <th>Role</th>
+
+                <th>Module</th>
+
+                <th>Action</th>
+
+                <th>Entity</th>
+
+                <th>Details</th>
+
+                <th class="text-center">View</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            @foreach (var log in AuditLogs)
+            {
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            @log.CreatedDate.ToString("dd MMM yyyy")
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            @log.CreatedDate.ToString("hh:mm tt")
+
+                        </small>
+
+                    </td>
+
+                    <td>
+
+                        <div class="fw-semibold">
+
+                            @log.FullName
+
+                        </div>
+
+                        <small class="text-muted">
+
+                            @log.UserName
+
+                        </small>
+
+                    </td>
+
+                    <td>
+
+                        <span class="badge rounded-pill bg-primary">
+
+                            @log.RoleName
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        <span class="badge rounded-pill bg-info">
+
+                            @log.ModuleName
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        @switch (log.ActionName)
+                        {
+                            case "Add":
+
+                                <span class="badge bg-success">
+
+                                    Add
+
+                                </span>
+
+                                break;
+
+                            case "Update":
+
+                                <span class="badge bg-warning text-dark">
+
+                                    Update
+
+                                </span>
+
+                                break;
+
+                            case "Delete":
+
+                                <span class="badge bg-danger">
+
+                                    Delete
+
+                                </span>
+
+                                break;
+
+                            case "Restore":
+
+                                <span class="badge bg-info">
+
+                                    Restore
+
+                                </span>
+
+                                break;
+
+                            default:
+
+                                <span class="badge bg-secondary">
+
+                                    @log.ActionName
+
+                                </span>
+
+                                break;
+                        }
+
+                    </td>
+
+                    <td>
+
+                        <strong>
+
+                            @log.EntityName
+
+                        </strong>
+
+                    </td>
+
+                    <td>
+
+                        @log.Details
+
+                    </td>
+
+                    <td class="text-center">
+
+                        <button class="btn btn-outline-primary btn-sm rounded-circle"
+                                @onclick="() => OnView.InvokeAsync(log)">
+
+                            <i class="bi bi-eye"></i>
+
+                        </button>
+
+                    </td>
+
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>
+
+@code {
+
+    [Parameter]
+
+    public IEnumerable<AuditLog> AuditLogs { get; set; } = [];
+
+    [Parameter]
+
+    public EventCallback<AuditLog> OnView { get; set; }
+
+}

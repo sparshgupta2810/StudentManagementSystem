@@ -1,0 +1,123 @@
+﻿@using StudentManagementSystemApp.Models
+
+<div class="row">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <i class="bi bi-person-circle me-2"></i>
+
+                User Information
+
+            </div>
+
+            <div class="card-body">
+
+                <p>
+
+                    <strong>Name</strong>
+
+                    <br>
+
+                    @Audit.FullName
+
+                </p>
+
+                <p>
+
+                    <strong>Username</strong>
+
+                    <br>
+
+                    @Audit.UserName
+
+                </p>
+
+                <p>
+
+                    <strong>Email</strong>
+
+                    <br>
+
+                    @Audit.Email
+
+                </p>
+
+                <p>
+
+                    <strong>Role</strong>
+
+                    <br>
+
+                    @Audit.RoleName
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header">
+
+                <i class="bi bi-activity me-2"></i>
+
+                Activity
+
+            </div>
+
+            <div class="card-body">
+
+                <p>
+
+                    <strong>Module</strong>
+
+                    <br>
+
+                    @Audit.ModuleName
+
+                </p>
+
+                <p>
+
+                    <strong>Action</strong>
+
+                    <br>
+
+                    @Audit.ActionName
+
+                </p>
+
+                <p>
+
+                    <strong>Entity</strong>
+
+                    <br>
+
+                    @Audit.EntityName
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code{
+
+    [Parameter]
+
+    public AuditLog Audit { get; set; } = default!;
+
+}

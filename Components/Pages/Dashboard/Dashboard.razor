@@ -1,0 +1,73 @@
+﻿@page "/dashboard"
+@page "/"
+
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Components.DashboardWidgets
+
+@inject DashboardDtoService DashboardService
+
+<PageTitle>Dashboard</PageTitle>
+
+@if (dashboard == null)
+{
+    <div class="dashboard-loading">
+
+        <div class="spinner-border text-primary"
+             role="status">
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="dashboard-page">
+
+        <!-- Hero -->
+        <DashboardHero />
+
+        <!-- KPI Cards -->
+        <DashboardCards Dashboard="dashboard" />
+
+        <!-- Charts -->
+        <div class="dashboard-grid">
+
+            <div class="grid-item span-6">
+
+                <DepartmentAnalytics Dashboard="dashboard" />
+
+            </div>
+
+            <div class="grid-item span-6">
+
+                <AdmissionTrend Dashboard="dashboard" />
+
+            </div>
+
+            <div class="grid-item span-6">
+
+                <MonthlyBookIssue Dashboard="dashboard" />
+
+            </div>
+
+            <div class="grid-item span-6">
+
+                <LibraryProgress Dashboard="dashboard" />
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@code{
+
+    private DashboardDto? dashboard;
+
+    protected override async Task OnInitializedAsync()
+    {
+        dashboard =
+            await DashboardService.GetDashboardAsync();
+    }
+
+}

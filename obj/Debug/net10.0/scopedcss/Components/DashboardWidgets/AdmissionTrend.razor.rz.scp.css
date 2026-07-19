@@ -1,0 +1,86 @@
+/* CSS for AdmissionTrend component */
+.trend-card[b-p9kbj8orjf] {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    border: 1px solid #eef2f7;
+    height: 100%;
+}
+
+.trend-header[b-p9kbj8orjf] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .trend-header h4[b-p9kbj8orjf] {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .trend-header span[b-p9kbj8orjf] {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+.trend-total[b-p9kbj8orjf] {
+    text-align: right;
+}
+
+    .trend-total h3[b-p9kbj8orjf] {
+        margin: 0;
+        color: #10B981;
+        font-weight: 700;
+    }
+
+    .trend-total small[b-p9kbj8orjf] {
+        color: #6c757d;
+    }
+
+.trend-item[b-p9kbj8orjf] {
+    margin: 22px 0;
+}
+
+.trend-top[b-p9kbj8orjf] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.year[b-p9kbj8orjf] {
+    font-weight: 700;
+    color: #374151;
+}
+
+.count[b-p9kbj8orjf] {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.trend-progress[b-p9kbj8orjf] {
+    height: 12px;
+    border-radius: 30px;
+    background: #edf2f7;
+    overflow: hidden;
+}
+
+    .trend-progress .progress-bar[b-p9kbj8orjf] {
+        border-radius: 30px;
+        transition: all .8s ease;
+    }
+
+.trend-footer[b-p9kbj8orjf] {
+    border-top: 1px solid #eef2f7;
+    margin-top: 20px;
+    padding-top: 15px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.trend-empty[b-p9kbj8orjf] {
+    text-align: center;
+    padding: 60px 20px;
+}

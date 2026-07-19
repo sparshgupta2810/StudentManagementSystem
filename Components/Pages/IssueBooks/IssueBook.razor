@@ -1,0 +1,422 @@
+﻿@page "/bookissues/issue"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = $"{Roles.Admin},{Roles.Librarian}")]
+
+@inject BookIssueService BookIssueService
+@inject NavigationManager Navigation
+
+<PageTitle>Issue Book</PageTitle>
+
+<div class="card card-primary shadow">
+
+    <div class="card-header">
+
+    <div class="d-flex justify-content-between align-items-start">
+
+        <h3 class="card-title mb-0">
+
+            <i class="bi bi-journal-arrow-up me-2"></i>
+
+            Issue Book
+
+        </h3>
+
+        <button class="btn btn-outline-light btn-sm"
+                @onclick="Back">
+
+            <i class="bi bi-arrow-left-circle me-1"></i>
+
+            Back to List
+
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+    <div class="card-body">
+
+        @if (!string.IsNullOrWhiteSpace(message))
+        {
+            <div class="alert alert-success">
+
+                <i class="bi bi-check-circle-fill"></i>
+
+                @message
+
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-danger">
+
+                <i class="bi bi-exclamation-triangle-fill"></i>
+
+                @error
+
+            </div>
+        }
+
+        <!-- Registration Number -->
+
+        <div class="row">
+
+            <div class="col-md-5">
+
+                <label class="form-label">
+
+                    Registration Number
+
+                </label>
+
+                <InputText class="form-control"
+                           placeholder="Enter Registration Number..."
+                           @bind-Value="registrationNo" />
+
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+
+                <button class="btn btn-primary w-100"
+                        @onclick="SearchStudent"
+                        disabled="@searching">
+
+                    @if (searching)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+
+                    <i class="bi bi-search"></i>
+
+                    Search
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <hr />
+
+        @if (student != null)
+        {
+
+            <div class="card card-info">
+
+                <div class="card-header">
+
+                    <strong>
+
+                        Student Details
+
+                    </strong>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-3">
+
+                            <label class="fw-bold">
+
+                                Registration No
+
+                            </label>
+
+                            <p>
+
+                                @student.RegistrationNo
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <label class="fw-bold">
+
+                                Student Name
+
+                            </label>
+
+                            <p>
+
+                                @student.FirstName
+                                @student.MiddleName
+                                @student.LastName
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label class="fw-bold">
+
+                                Department
+
+                            </label>
+
+                            <p>
+
+                                @student.DepartmentName
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <EditForm Model="bookIssue"
+                      OnValidSubmit="IssueBookDetails">
+
+                <DataAnnotationsValidator />
+
+                <ValidationSummary />
+
+                <div class="row mt-3">
+
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+
+                            Select Book
+
+                        </label>
+
+                        <InputSelect class="form-select"
+                                     @bind-Value="bookIssue.BookId">
+
+                            <option value="0">
+
+                                Select Book
+
+                            </option>
+
+                            @foreach (var book in books)
+                            {
+                                <option value="@book.Id">
+
+                                    @book.BookCode -
+                                    @book.BookName
+                                    (@book.AvailableCopies Available)
+
+                                </option>
+                            }
+
+                        </InputSelect>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+
+                            Issue Date
+
+                        </label>
+
+                        <InputDate class="form-control"
+                                   @bind-Value="bookIssue.IssueDate" />
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <label class="form-label">
+
+                            Due Date
+
+                        </label>
+
+                        <InputDate class="form-control"
+                                   @bind-Value="bookIssue.DueDate" />
+
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    <label class="form-label">
+
+                        Remarks
+
+                    </label>
+
+                    <InputTextArea class="form-control"
+                                   rows="3"
+                                   @bind-Value="bookIssue.Remarks" />
+
+                </div>
+
+                <div class="mt-4">
+
+                    <button class="btn btn-success"
+                            type="submit"
+                            disabled="@saving">
+
+                        @if (saving)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+
+                        <i class="bi bi-journal-check"></i>
+
+                        Issue Book
+
+                    </button>
+
+                    <button class="btn btn-secondary ms-2"
+                            type="button"
+                            @onclick="Back">
+
+                        <i class="bi bi-arrow-left-circle"></i>
+
+                        Back
+
+                    </button>
+
+                </div>
+
+            </EditForm>
+
+        }
+
+    </div>
+
+@code {
+
+    private BookIssue bookIssue = new()
+    {
+        IssueDate = DateTime.Today,
+        DueDate = DateTime.Today.AddDays(15),
+        Status = "Issued"
+    };
+
+    private Student? student;
+
+    private List<Book> books = new();
+
+    private string registrationNo = string.Empty;
+
+    private bool searching;
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadBooks();
+    }
+
+    private async Task LoadBooks()
+    {
+        books = (await BookIssueService
+            .GetAvailableBooksAsync())
+            .OrderBy(b => b.BookName)
+            .ToList();
+    }
+
+    private async Task SearchStudent()
+    {
+        try
+        {
+            searching = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            student = await BookIssueService
+                .GetStudentByRegistrationNoAsync(registrationNo);
+
+            if (student != null)
+            {
+                bookIssue.StudentId = student.Id;
+            }
+        }
+        catch (Exception ex)
+        {
+            student = null;
+            error = ex.Message;
+        }
+        finally
+        {
+            searching = false;
+        }
+    }
+
+    private async Task IssueBookDetails()
+    {
+        try
+        {
+            saving = true;
+
+            message = string.Empty;
+            error = string.Empty;
+
+            if (student == null)
+            {
+                error = "Please search and select a student.";
+                return;
+            }
+
+            if (bookIssue.BookId == 0)
+            {
+                error = "Please select a book.";
+                return;
+            }
+
+            await BookIssueService.IssueBookAsync(bookIssue);
+
+            message = "Book issued successfully.";
+
+            // Reload available books
+            await LoadBooks();
+
+            // Reset form
+            registrationNo = string.Empty;
+            student = null;
+
+            bookIssue = new BookIssue
+            {
+                IssueDate = DateTime.Today,
+                DueDate = DateTime.Today.AddDays(15),
+                Status = "Issued"
+            };
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/bookissues");
+    }
+
+}

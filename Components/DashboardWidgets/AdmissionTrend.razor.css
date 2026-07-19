@@ -1,0 +1,86 @@
+/* CSS for AdmissionTrend component */
+.trend-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    border: 1px solid #eef2f7;
+    height: 100%;
+}
+
+.trend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .trend-header h4 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .trend-header span {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+.trend-total {
+    text-align: right;
+}
+
+    .trend-total h3 {
+        margin: 0;
+        color: #10B981;
+        font-weight: 700;
+    }
+
+    .trend-total small {
+        color: #6c757d;
+    }
+
+.trend-item {
+    margin: 22px 0;
+}
+
+.trend-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.year {
+    font-weight: 700;
+    color: #374151;
+}
+
+.count {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.trend-progress {
+    height: 12px;
+    border-radius: 30px;
+    background: #edf2f7;
+    overflow: hidden;
+}
+
+    .trend-progress .progress-bar {
+        border-radius: 30px;
+        transition: all .8s ease;
+    }
+
+.trend-footer {
+    border-top: 1px solid #eef2f7;
+    margin-top: 20px;
+    padding-top: 15px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.trend-empty {
+    text-align: center;
+    padding: 60px 20px;
+}

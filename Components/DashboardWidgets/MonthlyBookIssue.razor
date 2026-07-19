@@ -1,0 +1,108 @@
+﻿@using StudentManagementSystemApp.Models
+
+<div class="book-card">
+
+    <div class="book-header">
+
+        <div>
+
+            <h4>
+
+                <i class="fas fa-book-reader text-primary me-2"></i>
+
+                Monthly Book Issues
+
+            </h4>
+
+            <span>
+
+                Books issued this year
+
+            </span>
+
+        </div>
+
+    </div>
+
+    @{
+       
+    var lastSixMonths = Enumerable.Range(0, 6)
+        .Select(i => DateTime.Today.AddMonths(-(5 - i)).ToString("MMMM"))
+        .ToList();
+
+    var issues = lastSixMonths
+        .Select(month =>
+        {
+            var data = Dashboard.MonthlyBookIssues
+                .FirstOrDefault(x => x.Month == month);
+
+            return new
+            {
+                Month = month.Substring(0, 3), // Jan, Feb, Mar...
+                TotalBooks = data?.TotalBooks ?? 0
+            };
+        })
+        .ToList();
+
+    var max = issues.Any()
+        ? Math.Max(issues.Max(x => x.TotalBooks), 1)
+        : 1;
+
+    }
+
+    @if (!issues.Any())
+    {
+        <div class="text-center py-5">
+
+            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+
+            <h5>No Books Issued</h5>
+
+            <p class="text-muted">
+                No books have been issued yet.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="bar-chart">
+
+    @foreach (var item in issues)
+    {
+        var height = item.TotalBooks == 0
+            ? 8
+            : Math.Max(25, (double)item.TotalBooks * 180 / max);
+
+        <div class="bar-item">
+
+            <span class="value">
+
+                @(item.TotalBooks)
+
+            </span>
+
+            <div class="bar @(item.TotalBooks == 0 ? "empty-bar" : "")"
+                 style="height:@($"{height}px")">
+            </div>
+
+            <span class="month">
+
+                @item.Month
+
+            </span>
+
+        </div>
+    }
+
+</div>
+    }
+    
+</div>
+
+@code {
+
+    [Parameter]
+    public DashboardDto Dashboard { get; set; } = new();
+
+}

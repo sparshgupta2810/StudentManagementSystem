@@ -1,0 +1,200 @@
+﻿@page "/subjects/inactive/{Id:int}"
+
+@using Microsoft.AspNetCore.Authorization
+@using StudentManagementSystemApp.Constants
+@using StudentManagementSystemApp.Models
+@using StudentManagementSystemApp.Services
+
+@attribute [Authorize(Roles = Roles.Admin)]
+
+@inject SubjectService SubjectService
+@inject NavigationManager Navigation
+
+<PageTitle>Inactive Subject</PageTitle>
+
+<div class="card card-danger shadow">
+
+    <div class="card-header">
+
+        <h3 class="card-title">
+
+            <i class="bi bi-exclamation-triangle-fill"></i>
+
+            Make Subject Inactive
+
+        </h3>
+
+    </div>
+
+    @if (loading)
+    {
+        <div class="card-body text-center p-5">
+
+            <div class="spinner-border text-danger"></div>
+
+            <p class="mt-3">
+
+                Loading Subject...
+
+            </p>
+
+        </div>
+    }
+    else if (subject == null)
+    {
+        <div class="card-body">
+
+            <div class="alert alert-danger">
+
+                Subject not found.
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="card-body">
+
+            @if (!string.IsNullOrWhiteSpace(message))
+            {
+                <div class="alert alert-success">
+
+                    <i class="bi bi-check-circle-fill"></i>
+
+                    @message
+
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <div class="alert alert-danger">
+
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+                    @error
+
+                </div>
+            }
+
+            <div class="alert alert-warning">
+
+                <h5>
+
+                    Are you sure?
+
+                </h5>
+
+                <hr />
+
+                <p>
+
+                    <strong>Subject Code :</strong>
+
+                    @subject.SubjectCode
+
+                </p>
+
+                <p>
+
+                    <strong>Subject Name :</strong>
+
+                    @subject.SubjectName
+
+                </p>
+
+                <p class="mb-0">
+
+                    This subject will be moved to
+                    <strong>Subject History</strong>.
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <button class="btn btn-danger"
+                    @onclick="MakeSubjectInactive"
+                    disabled="@saving">
+
+                @if (saving)
+                {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+
+                <i class="bi bi-x-circle"></i>
+
+                Make Inactive
+
+            </button>
+
+            <button class="btn btn-secondary ms-2"
+                    @onclick="Back">
+
+                <i class="bi bi-arrow-left-circle"></i>
+
+                Cancel
+
+            </button>
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Subject? subject;
+
+    private bool loading = true;
+
+    private bool saving;
+
+    private string? message;
+
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        subject = await SubjectService.GetSubjectByIdAsync(Id);
+
+        loading = false;
+    }
+
+    private async Task MakeSubjectInactive()
+    {
+        try
+        {
+            saving = true;
+
+            await SubjectService.InactivateSubjectAsync(Id);
+
+            message = "Subject moved to history successfully.";
+
+            await Task.Delay(800);
+
+            Navigation.NavigateTo("/subjects");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            saving = false;
+        }
+    }
+
+    private void Back()
+    {
+        Navigation.NavigateTo("/subjects");
+    }
+
+}

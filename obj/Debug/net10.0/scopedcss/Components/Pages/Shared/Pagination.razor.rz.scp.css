@@ -1,0 +1,26 @@
+/* CSS for Pagination component */
+.pagination .page-link[b-ttx6u9g22h] {
+    color: #0d6efd;
+    border-radius: 8px;
+    margin: 0 2px;
+    transition: .25s;
+}
+
+.pagination .page-item.active .page-link[b-ttx6u9g22h] {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    box-shadow: 0 4px 12px rgba(13,110,253,.25);
+}
+
+.pagination .page-link:hover[b-ttx6u9g22h] {
+    background: #eef5ff;
+}
+
+.input-group-text[b-ttx6u9g22h] {
+    background: #f8f9fa;
+}
+
+.form-select[b-ttx6u9g22h] {
+    cursor: pointer;
+}

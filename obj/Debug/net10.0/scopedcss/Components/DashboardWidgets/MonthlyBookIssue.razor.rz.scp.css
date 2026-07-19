@@ -1,0 +1,67 @@
+/* CSS for MonthlyBookIssue component */
+.book-card[b-cnqpq6mq0k] {
+    background: #fff;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    border: 1px solid #edf2f7;
+    height: 100%;
+}
+
+.book-header[b-cnqpq6mq0k] {
+    margin-bottom: 30px;
+}
+
+    .book-header h4[b-cnqpq6mq0k] {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .book-header span[b-cnqpq6mq0k] {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+.bar-chart[b-cnqpq6mq0k] {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 28px;
+    overflow-x: auto;
+    padding: 10px 5px;
+}
+
+.bar-item[b-cnqpq6mq0k] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    width: 45px;
+}
+
+.value[b-cnqpq6mq0k] {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #2563eb;
+}
+
+.bar[b-cnqpq6mq0k] {
+    width: 34px;
+    border-radius: 10px 10px 0 0;
+    background: linear-gradient(180deg,#3b82f6,#2563eb);
+    transition: .4s;
+    box-shadow: 0 8px 20px rgba(37,99,235,.25);
+}
+
+    .bar:hover[b-cnqpq6mq0k] {
+        transform: translateY(-6px);
+        background: linear-gradient(180deg,#6366f1,#3b82f6);
+    }
+
+.month[b-cnqpq6mq0k] {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
