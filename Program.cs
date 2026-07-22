@@ -50,7 +50,6 @@ builder.Services.AddScoped<IDashboardDtoRepository, DashboardDtoRepository>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<IStudentNotificationRepository, StudentNotificationRepository>();
 
 builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<SubjectService>();
